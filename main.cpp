@@ -1,22 +1,20 @@
 #include <cstdint>
 #include "WinApp.h"
+#include "DirectXCommon.h"
 
-typedef struct Vector4
-{
-	float x;
-	float y;
-	float z;
-	float w;
-} Vector4;
 
-WinApp* window_ = new WinApp();
+const wchar_t kWindowTitle[] = { L"CG2" };
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	WinApp::CreateWindowView(window_->title);
+	
+	//初期化
+	WinApp::CreateWindowView(kWindowTitle);
+	DirectXCommon::DirectXInitialization();
+	
 
 	MSG msg{};
-
+	// ウィンドウのxが押されるまでループ
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -26,7 +24,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else
 		{
-
+			// ゲームの処理
 		}
 	}
 	return 0;
