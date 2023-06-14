@@ -19,12 +19,6 @@
     <Filter Include="ヘッダー ファイル\Common">
       <UniqueIdentifier>{3a23b944-94ee-4cad-8670-a16df21300aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\3D">
-      <UniqueIdentifier>{d98fa4ea-2fec-442c-9194-fcd9493ce14c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\3D">
-      <UniqueIdentifier>{f45e33b2-73dd-4389-a590-ca288535c723}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -39,8 +33,14 @@
     <ClCompile Include="Common\WinApp.cpp">
       <Filter>ソース ファイル\Common</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>ソース ファイル\3D</Filter>
+    <ClCompile Include="CreateEngine.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvertString.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -54,8 +54,14 @@
     <ClInclude Include="Common\DirectXCommon.h">
       <Filter>ヘッダー ファイル\Common</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>ヘッダー ファイル\3D</Filter>
+    <ClInclude Include="CreateEngine.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvertString.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

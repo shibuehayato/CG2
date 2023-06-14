@@ -16,7 +16,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WinApp::CreateWindowView(const wchar_t* title)
+void WinApp::CreateWindowView(const wchar_t* title, int32_t clientWidth, int32_t clientheight)
 {
 	// ウィンドウプロシージャ
 	wc_.lpfnWndProc = WindowProc;
@@ -30,7 +30,7 @@ void WinApp::CreateWindowView(const wchar_t* title)
 	RegisterClass(&wc_);
 
 	// ウィンドウサイズの構造体にクライアント領域を入れる
-	RECT wtc = { 0, 0, kWindowWidth_, kWindowHeight_ };
+	RECT wtc = { 0, 0, kClientWidth,kClientHeight };
 
 	// クライアント領域を元に実際のサイズにwrcを変更してもらう
 	AdjustWindowRect(&wtc, WS_OVERLAPPEDWINDOW, false);
@@ -49,7 +49,44 @@ void WinApp::CreateWindowView(const wchar_t* title)
 		wc_.hInstance,		  // インスタンスハンドル
 		nullptr				  // オプション
 	);
+
+#ifdef _DEBUG // デバッグレイヤー
+	debugController_ = nullptr;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_)))) {
+		// デバッグレイヤーの有効化
+		debugController_->EnableDebugLayer();
+		// GPU側でもチェックを行う
+		debugController_->SetEnableGPUBasedValidation(true);
+	}
+#endif // _DEBUG
+
+
 	// ウィンドウの表示
 	ShowWindow(hwnd_, SW_SHOW);
 }
+
+bool WinApp::Procesmessage() {
+	MSG msg{};
+
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	if (msg.message == WM_QUIT) // 終了メッセージが来たらループを抜ける
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void WinApp::Finalize()
+{
+	debugController_->Release();
+}
+
 HWND WinApp::hwnd_;
+UINT WinApp::windowStyle_;
+ID3D12Debug1* WinApp::debugController_;
