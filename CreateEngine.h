@@ -22,7 +22,7 @@ public:
 
 	void Update();
 
-	void DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c);
+	void DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
 
 private:
 	static WinApp* win_;
@@ -55,6 +55,8 @@ private:
 
 	ID3D12Resource* vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+
+	ID3D12Resource* materialResource_;
 
 	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};

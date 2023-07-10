@@ -6,9 +6,10 @@ void Triangle::Initialize(DirectXCommon* dxCommon)
 {
 	dxCommon_ = dxCommon;
 	SettingVertex();
+	SettingColor();
 }
 
-void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c)
+void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material)
 {
 	//左下
 	vertexData_[0] = a;
@@ -17,20 +18,46 @@ void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c)
 	//右下
 	vertexData_[2] = c;
 
+	*materialData_ = material;
+
 	//VBVを設定
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//形状を設定。PS0にせっていしているものとはまた別。同じものを設定する
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//描画
 	dxCommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
 
 void Triangle::Finalize()
 {
+	materialResource_->Release();
 	vertexResource_->Release();
 }
 
 void Triangle::SettingVertex()
+{
+
+	vertexResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Vector4) * 3);
+
+	//リソースの先頭のアドレスから使う
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	//使用するリソースのサイズは頂点3つ分のサイズ
+	vertexBufferView_.SizeInBytes = sizeof(Vector4) * 3;
+	//1頂点当たりのサイズ
+	vertexBufferView_.StrideInBytes = sizeof(Vector4);
+	//書き込むためのアドレスを取得
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+
+}
+
+void Triangle::SettingColor()
+{
+	materialResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Vector4));
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+}
+
+ID3D12Resource* Triangle::CreateBufferResource(ID3D12Device* device, size_t sizeInByte)
 {
 	//頂点リソース用のヒープの設定
 	D3D12_HEAP_PROPERTIES uplodeHeapProperties{};
@@ -49,18 +76,13 @@ void Triangle::SettingVertex()
 	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	HRESULT hr;
 
+	ID3D12Resource* Resource = nullptr;
+
 	//実際に頂点リソースを作る
 	hr = dxCommon_->GetDevice()->CreateCommittedResource(&uplodeHeapProperties, D3D12_HEAP_FLAG_NONE,
 		&vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-		IID_PPV_ARGS(&vertexResource_));
+		IID_PPV_ARGS(&Resource));
 	assert(SUCCEEDED(hr));
-	//リソースの先頭のアドレスから使う
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(Vector4) * 3;
-	//1頂点当たりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(Vector4);
-	//書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
+	return Resource;
 }

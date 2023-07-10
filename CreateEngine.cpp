@@ -86,13 +86,22 @@ void CreateEngine::InitializeDxcCompiler()
 	assert(SUCCEEDED(hr));
 }
 
-
 void CreateEngine::CreateRootSignature()
 {
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	// RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
+	D3D12_ROOT_PARAMETER rootParameters_[1] = {};
+	rootParameters_[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+	rootParameters_[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+	rootParameters_[0].Descriptor.ShaderRegister = 0; // レジスタ番号0とバインド           
+	descriptionRootSignature.pParameters = rootParameters_; // ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters_); // 配列の長さ
+
+
 	// シリアライズしてバイナリにする
 	signatureBlob_ = nullptr;
 	errorBlob_ = nullptr;
@@ -196,7 +205,7 @@ void CreateEngine::VertexResource()
 		&vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
 		IID_PPV_ARGS(&vertexResource_));
 	assert(SUCCEEDED(hr));
-
+	
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズは頂点3つ分のサイズ
@@ -260,6 +269,7 @@ void CreateEngine::Initialization(WinApp* win, const wchar_t* title, int32_t wid
 
 void CreateEngine::BeginFrame()
 {
+	triangleCount_ = 0;
 	dxCommon_->PreDraw();
 	//viewportを設定
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -297,13 +307,10 @@ void CreateEngine::Update()
 {
 }
 
-void CreateEngine::DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c)
+void CreateEngine::DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material)
 {
 	triangleCount_++;
-	triangle_[triangleCount_]->Draw(a, b, c);
-	if (triangleCount_ >= 10) {
-		triangleCount_ = 0;
-	}
+	triangle_[triangleCount_]->Draw(a, b, c, material);
 }
 
 DirectXCommon* CreateEngine::dxCommon_;
