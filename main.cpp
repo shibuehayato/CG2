@@ -528,6 +528,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	scissorRect.top = 0;
 	scissorRect.bottom = kClientHeight;
 	
+	// Transform変数を作る
+	Transform transform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+
 	// ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
 		// Windowにメッセージが来てたら最優先で処理させる
@@ -537,6 +540,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else {
 		  // ゲームの処理
+
+			transform.rotate.y += 0.03f;
+			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+			*wvpData = worldMatrix;
 
 			// RTVの設定
 			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};

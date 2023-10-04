@@ -19,7 +19,7 @@ struct Transform
 {
 	Vector3 scale;
 	Vector3 rotate;
-	Vector3 transform;
+	Vector3 translate;
 };
 
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
@@ -28,4 +28,10 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 Matrix4x4 MakeIdentity4x4();
 
-Matrix4x4 MakeAffineMatrix(Vector3& scale, Vector3& rotation, Vector3 transform);
+Matrix4x4 MakeRotateXMatrix(float radian);
+
+Matrix4x4 MakeRotateYMatrix(float radian);
+
+Matrix4x4 MakeRotateZMatrix(float radian);
+
+Matrix4x4 MakeAffineMatrix(Vector3& scale, Vector3& rotation, Vector3 translate);

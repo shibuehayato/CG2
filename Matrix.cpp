@@ -78,9 +78,73 @@ Matrix4x4 MakeIdentity4x4()
 	return result;
 }
 
-Matrix4x4 MakeAffineMatrix(Vector3& scale, Vector3& rotation, Vector3 transform)
+Matrix4x4 MakeRotateXMatrix(float radian) {
+	Matrix4x4 result{ };
+
+	result.m[0][0] = 1;
+	result.m[1][1] = std::cos(radian);
+	result.m[1][2] = std::sin(radian);
+	result.m[2][1] = -(std::sin(radian));
+	result.m[2][2] = std::cos(radian);
+	result.m[3][3] = 1;
+
+
+	return result;
+}
+Matrix4x4 MakeRotateYMatrix(float radian) {
+	Matrix4x4 result{ };
+
+	result.m[0][0] = std::cos(radian);
+	result.m[0][2] = -(std::sin(radian));
+	result.m[1][1] = 1;
+	result.m[2][0] = std::sin(radian);
+	result.m[2][2] = std::cos(radian);
+	result.m[3][3] = 1;
+
+
+	return result;
+}
+Matrix4x4 MakeRotateZMatrix(float radian) {
+	Matrix4x4 result{ };
+
+	result.m[0][0] = std::cos(radian);
+	result.m[1][0] = -(std::sin(radian));
+	result.m[0][1] = std::sin(radian);
+	result.m[1][1] = std::cos(radian);
+	result.m[2][2] = 1;
+	result.m[3][3] = 1;
+
+
+	return result;
+}
+
+Matrix4x4 MakeAffineMatrix(Vector3& scale, Vector3& rotation, Vector3 translate)
 {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 
+	Matrix4x4 rotateXYZMatrix = Multiply(
+		MakeRotateXMatrix(rotation.x),
+		Multiply(MakeRotateYMatrix(rotation.y), MakeRotateZMatrix(rotation.z)));
 
+	result.m[0][0] = rotateXYZMatrix.m[0][0] * scale.x;
+	result.m[0][1] = rotateXYZMatrix.m[0][1] * scale.x;
+	result.m[0][2] = rotateXYZMatrix.m[0][2] * scale.x;
+	result.m[0][3] = 0;
+
+	result.m[1][0] = rotateXYZMatrix.m[1][0] * scale.y;
+	result.m[1][1] = rotateXYZMatrix.m[1][1] * scale.y;
+	result.m[1][2] = rotateXYZMatrix.m[1][2] * scale.y;
+	result.m[1][3] = 0;
+
+	result.m[2][0] = rotateXYZMatrix.m[2][0] * scale.z;
+	result.m[2][1] = rotateXYZMatrix.m[2][1] * scale.z;
+	result.m[2][2] = rotateXYZMatrix.m[2][2] * scale.z;
+	result.m[2][3] = 0;
+
+	result.m[3][0] = translate.x;
+	result.m[3][1] = translate.y;
+	result.m[3][2] = translate.z;
+	result.m[3][3] = 1;
+
+	return result;
 }
