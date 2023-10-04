@@ -34,4 +34,8 @@ Matrix4x4 MakeRotateYMatrix(float radian);
 
 Matrix4x4 MakeRotateZMatrix(float radian);
 
-Matrix4x4 MakeAffineMatrix(Vector3& scale, Vector3& rotation, Vector3 translate);
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotation, const Vector3 translate);
+
+Matrix4x4 Inverse(const Matrix4x4& m);
+
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
