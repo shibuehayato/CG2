@@ -28,6 +28,12 @@ struct Transform
 	Vector3 translate;
 };
 
+struct TransformationMatrix
+{
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+};
+
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
 Matrix4x4 MakeScaleMatrix(const Vector3& scale);
@@ -45,4 +51,3 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotation, const 
 Matrix4x4 Inverse(const Matrix4x4& m);
 
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
-
