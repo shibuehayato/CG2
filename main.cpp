@@ -954,6 +954,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	textureResource->Release();
 	instancingResource->Release();
 
+	//dxcUtils->Release();
+	//dxcCompiler->Release();
+	//includeHandler->Release();
+
 	ImGui_ImplDX12_Shutdown();
 	ImGui::DestroyContext();
 #ifdef _DEBUG
