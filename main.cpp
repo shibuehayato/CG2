@@ -15,6 +15,13 @@
 #include "MyMath.h"
 #include <wrl.h>
 
+#include <crtdbg.h>
+#include <memory.h>
+
+#ifdef _DEBUG
+# define DEBUG_NEW new(_CLIENT_BLOCK,__FILE__,__LINE__)
+#endif
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #pragma comment(lib, "d3d12.lib")
@@ -286,7 +293,9 @@ void UploadTextureDate(ID3D12Resource* texture, const DirectX::ScratchImage& mip
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	
+
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	// 出力ウィンドウへの文字出力
@@ -757,7 +766,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, desriptorsizeSRV, 3);
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, desriptorsizeSRV, 3);
 	device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
-	
+
 	Transform transforms[kNumInstance];
 	for (uint32_t index = 0; index < kNumInstance; ++index)
 	{
@@ -923,7 +932,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			hr = commandList->Reset(commandAllocator, nullptr);
 			assert(SUCCEEDED(hr));
 		}
-		
 	}
 	CoUninitialize();
 	CloseHandle(fenceEvent);
@@ -956,7 +964,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxcUtils->Release();
 	dxcCompiler->Release();
 	includeHandler->Release();
-
 	ImGui_ImplDX12_Shutdown();
 	ImGui::DestroyContext();
 #ifdef _DEBUG
