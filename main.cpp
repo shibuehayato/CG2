@@ -953,7 +953,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	wvpResource->Release();
 	textureResource->Release();
 	instancingResource->Release();
-	
 	dxcUtils->Release();
 	dxcCompiler->Release();
 	includeHandler->Release();
