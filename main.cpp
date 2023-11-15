@@ -15,12 +15,7 @@
 #include "MyMath.h"
 #include <wrl.h>
 
-#include <crtdbg.h>
 #include <memory.h>
-
-#ifdef _DEBUG
-# define DEBUG_NEW new(_CLIENT_BLOCK,__FILE__,__LINE__)
-#endif
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -309,8 +304,6 @@ struct D3DResourceLeakChecker {
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	D3DResourceLeakChecker leakCheck;
-
-	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
