@@ -28,6 +28,12 @@ struct Transform
 	Vector3 translate;
 };
 
+struct Particle
+{
+	Transform transform;
+	Vector3 velocity;
+};
+
 struct TransformationMatrix
 {
 	Matrix4x4 WVP;
