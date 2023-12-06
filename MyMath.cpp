@@ -1,5 +1,19 @@
 #include "MyMath.h"
 
+Vector3 Add(Vector3 v1, Vector3 v2)
+{
+	Vector3 num;
+
+	float a[3] = { v1.x, v1.y, v1.z };
+	float b[3] = { v2.x, v2.y, v2.z };
+
+	num.x = a[0] + b[0];
+	num.y = a[1] + b[1];
+	num.z = a[2] + b[2];
+
+	return num;
+}
+
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
 {
 	Matrix4x4 result;
@@ -23,6 +37,17 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
 	result.m[3][1] = m1.m[3][0] * m2.m[0][1] + m1.m[3][1] * m2.m[1][1] + m1.m[3][2] * m2.m[2][1] + m1.m[3][3] * m2.m[3][1];
 	result.m[3][2] = m1.m[3][0] * m2.m[0][2] + m1.m[3][1] * m2.m[1][2] + m1.m[3][2] * m2.m[2][2] + m1.m[3][3] * m2.m[3][2];
 	result.m[3][3] = m1.m[3][0] * m2.m[0][3] + m1.m[3][1] * m2.m[1][3] + m1.m[3][2] * m2.m[2][3] + m1.m[3][3] * m2.m[3][3];
+
+	return result;
+}
+
+Vector3 MulVector3AndFloat(const Vector3& m1, const float& m2)
+{
+	Vector3 result;
+
+	result.x = m1.x * m2;
+	result.y = m1.y * m2;
+	result.z = m1.z * m2;
 
 	return result;
 }

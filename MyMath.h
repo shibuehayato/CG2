@@ -40,7 +40,11 @@ struct TransformationMatrix
 	Matrix4x4 World;
 };
 
+Vector3 Add(Vector3 v1, Vector3 v2);
+
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
+
+Vector3 MulVector3AndFloat(const Vector3& m1, const float& m2);
 
 Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 

@@ -777,13 +777,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), desriptorsizeSRV, 3);
 	device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
 
-	Transform transforms[kNumInstance];
+	Particle particles[kNumInstance];
 	for (uint32_t index = 0; index < kNumInstance; ++index)
 	{
-		transforms[index].scale = { 1.0f, 1.0f, 1.0f };
-		transforms[index].rotate = { 0.0f, 0.0f, 0.0f };
-		transforms[index].translate = {index * 0.1f, index * 0.1f, index * 0.1f};
+		particles[index].transform.scale = { 1.0f, 1.0f, 1.0f };
+		particles[index].transform.rotate = { 0.0f, 0.0f, 0.0f };
+		particles[index].transform.translate = {index * 0.1f, index * 0.1f, index * 0.1f};
+		particles[index].velocity = { 0.0f,1.0f,0.0f };
 	}
+	const float kDeltaTime = 1.0f / 60.0f;
 
 	// SRVを作成するDescriptorHeapの場所を決める
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -818,7 +820,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else {
 			// ゲームの処理
-
+			
 			//transform.rotate.y += 0.03f;
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 			*wvpData = worldMatrix;
@@ -830,8 +832,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			for (uint32_t index = 0; index < kNumInstance; ++index)
 			{
+				particles[index].transform.translate = Add(particles[index].transform.translate,MulVector3AndFloat(particles[index].velocity,kDeltaTime));
+
 				Matrix4x4 worldMatrix =
-					MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+					MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
 				Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 				instancingData[index].WVP = worldViewProjectionMatrix;
 				instancingData[index].World = worldMatrix;
