@@ -37,7 +37,7 @@ struct Particle
 struct TransformationMatrix
 {
 	Matrix4x4 WVP;
-	Matrix4x4 World;
+	//Matrix4x4 World;
 };
 
 Vector3 Add(Vector3 v1, Vector3 v2);
