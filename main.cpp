@@ -576,7 +576,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	for (uint32_t index = 0; index < kNumInstance; ++index)
 	{
 		instancingData[index].WVP = MakeIdentity4x4();
-		instancingData[index].World = MakeIdentity4x4();
+		instancingData[index].WVP = MakeIdentity4x4();
 	}
 
 	// シリアライズしてバイナリにする
@@ -688,22 +688,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
 	// 左下
-	vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+	vertexData[0].position = { -0.8f, -0.8f, 0.0f, 1.0f };
 	vertexData[0].texcoord = { 0.0f, 1.0f };
 	// 上
-	vertexData[1].position = { -0.5f, 0.5f, 0.0f, 1.0f };
+	vertexData[1].position = { -0.8f, -0.4f, 0.0f, 1.0f };
 	vertexData[1].texcoord = { 0.0f, 0.0f };
 	// 右下
-	vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+	vertexData[2].position = { -0.4f, -0.8f, 0.0f, 1.0f };
 	vertexData[2].texcoord = { 1.0f,1.0f };
 	// 左下
-	vertexData[3].position = { -0.5f, 0.5f, 0.0f, 1.0f };
+	vertexData[3].position = { -0.8f, -0.4f, 0.0f, 1.0f };
 	vertexData[3].texcoord = { 0.0f, 0.0f };
 	// 上
-	vertexData[4].position = { 0.5f, 0.5f, 0.0f, 1.0f };
+	vertexData[4].position = { -0.4f, -0.4f, 0.0f, 1.0f };
 	vertexData[4].texcoord = { 1.0f,0.0f };
 	// 右下
-	vertexData[5].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+	vertexData[5].position = { -0.4f, -0.8f, 0.0f, 1.0f };
 	vertexData[5].texcoord = { 1.0f,1.0f };
 
 	// ビューポート
@@ -726,10 +726,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// Transform変数を作る
 	Transform transform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
-	Vector3 cameraPosition = { 0,1.0f,-4.0f };
+	Vector3 cameraPosition = { 0,1.0f,-10.0f };
 	const int kWindowWidth = 1280;
 	const int kWindowHeight = 720;
-	Transform cameraTransform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };
+	Transform cameraTransform{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -10.0f} };
 
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -834,7 +834,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
 				Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 				instancingData[index].WVP = worldViewProjectionMatrix;
-				instancingData[index].World = worldMatrix;
+				instancingData[index].WVP = worldMatrix;
 			}
 
 			ImGui_ImplDX12_NewFrame();
