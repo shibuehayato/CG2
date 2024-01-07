@@ -14,8 +14,8 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "MyMath.h"
 #include <wrl.h>
-
 #include <memory.h>
+#include <numbers>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -565,7 +565,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 単位行列を書きこんでおく
 	*wvpData = MakeIdentity4x4();
 
-	const uint32_t kNumInstance = 10; // インスタンス数
+	const uint32_t kNumInstance = 1; // インスタンス数
 	// Instancing用のTransformationMatrixリソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource =
 		CreateBufferResource(device, sizeof(TransformationMatrix) * kNumInstance);
@@ -576,7 +576,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	for (uint32_t index = 0; index < kNumInstance; ++index)
 	{
 		instancingData[index].WVP = MakeIdentity4x4();
-		instancingData[index].WVP = MakeIdentity4x4();
+		instancingData[index].World = MakeIdentity4x4();
 	}
 
 	// シリアライズしてバイナリにする
@@ -661,8 +661,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr));
 
+	const uint32_t kSubdivision = 16; // 分割数
+	const uint32_t kVertexCount = kSubdivision * kSubdivision * 6; // 球体頂点数
+
 	// 実際に頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device, sizeof(VertexDate) * 6);
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device, sizeof(VertexDate) * kVertexCount);
 
 	// マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device, sizeof(VertexDate));
@@ -678,7 +681,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	// 使用するリソースのサイズは頂点6つ分のサイズ
-	vertexBufferView.SizeInBytes = sizeof(VertexDate) * 6;
+	vertexBufferView.SizeInBytes = UINT(sizeof(VertexDate) * kVertexCount);
 	// 1頂点あたりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(VertexDate);
 
@@ -687,24 +690,68 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 書き込むためのアドレスを取得
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-	// 左下
-	vertexData[0].position = { -0.8f, -0.8f, 0.0f, 1.0f };
-	vertexData[0].texcoord = { 0.0f, 1.0f };
-	// 上
-	vertexData[1].position = { -0.8f, -0.4f, 0.0f, 1.0f };
-	vertexData[1].texcoord = { 0.0f, 0.0f };
-	// 右下
-	vertexData[2].position = { -0.4f, -0.8f, 0.0f, 1.0f };
-	vertexData[2].texcoord = { 1.0f,1.0f };
-	// 左下
-	vertexData[3].position = { -0.8f, -0.4f, 0.0f, 1.0f };
-	vertexData[3].texcoord = { 0.0f, 0.0f };
-	// 上
-	vertexData[4].position = { -0.4f, -0.4f, 0.0f, 1.0f };
-	vertexData[4].texcoord = { 1.0f,0.0f };
-	// 右下
-	vertexData[5].position = { -0.4f, -0.8f, 0.0f, 1.0f };
-	vertexData[5].texcoord = { 1.0f,1.0f };
+	// 球体用頂点
+	const float kPi = std::numbers::pi_v<float>;
+	const float kLonEvery = (2 * kPi) / float(kSubdivision); // 経度分割1つ分の角度
+	const float kLatEvery = kPi / float(kSubdivision); // 緯度分割1つ分の角度
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -kPi / 2.0f + kLatEvery * latIndex;
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
+			float lon = lonIndex * kLonEvery;
+			// a
+			vertexData[start].position.x = cos(lat) * cos(lon);
+			vertexData[start].position.y = sin(lat);
+			vertexData[start].position.z = cos(lat) * sin(lon);
+			vertexData[start].position.w = 1.0f;
+			vertexData[start].texcoord.x = float(lonIndex) / float(kSubdivision);
+			vertexData[start].texcoord.y = 1.0f - float(latIndex) / float(kSubdivision);
+			// b
+			vertexData[start + 1].position.x = cos(lat + kLatEvery) * cos(lon);
+			vertexData[start + 1].position.y = sin(lat + kLatEvery);
+			vertexData[start + 1].position.z = cos(lat + kLatEvery) * sin(lon);
+			vertexData[start + 1].position.w = 1.0f;
+			vertexData[start + 1].texcoord.x = float(lonIndex) / float(kSubdivision);
+			vertexData[start + 1].texcoord.y = 1.0f - float(latIndex+1) / float(kSubdivision);
+			// c
+			vertexData[start + 2].position.x = cos(lat) * cos(lon + kLonEvery);
+			vertexData[start + 2].position.y = sin(lat);
+			vertexData[start + 2].position.z = cos(lat) * sin(lon + kLonEvery);
+			vertexData[start + 2].position.w = 1.0f;
+			vertexData[start + 2].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
+			vertexData[start + 2].texcoord.y = 1.0f - float(latIndex) / float(kSubdivision);
+			// c
+			vertexData[start + 3] = vertexData[start + 2];
+			// b
+			vertexData[start + 4] = vertexData[start + 1];
+			// d
+			vertexData[start + 5].position.x = cos(lat + kLatEvery) * cos(lon + kLonEvery);
+			vertexData[start + 5].position.y = sin(lat + kLatEvery);
+			vertexData[start + 5].position.z = cos(lat + kLatEvery) * sin(lon + kLonEvery);
+			vertexData[start + 5].position.w = 1.0f;
+			vertexData[start + 5].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
+			vertexData[start + 5].texcoord.y = 1.0f - float(latIndex + 1) / float(kSubdivision);
+		}
+	}
+
+	//// 左下
+	//vertexData[0].position = { -0.8f, -0.8f, 0.0f, 1.0f };
+	//vertexData[0].texcoord = { 0.0f, 1.0f };
+	//// 上
+	//vertexData[1].position = { -0.8f, -0.4f, 0.0f, 1.0f };
+	//vertexData[1].texcoord = { 0.0f, 0.0f };
+	//// 右下
+	//vertexData[2].position = { -0.4f, -0.8f, 0.0f, 1.0f };
+	//vertexData[2].texcoord = { 1.0f,1.0f };
+	//// 左下
+	//vertexData[3].position = { -0.8f, -0.4f, 0.0f, 1.0f };
+	//vertexData[3].texcoord = { 0.0f, 0.0f };
+	//// 上
+	//vertexData[4].position = { -0.4f, -0.4f, 0.0f, 1.0f };
+	//vertexData[4].texcoord = { 1.0f,0.0f };
+	//// 右下
+	//vertexData[5].position = { -0.4f, -0.8f, 0.0f, 1.0f };
+	//vertexData[5].texcoord = { 1.0f,1.0f };
 
 	// ビューポート
 	D3D12_VIEWPORT viewport{};
@@ -834,7 +881,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
 				Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 				instancingData[index].WVP = worldViewProjectionMatrix;
-				instancingData[index].WVP = worldMatrix;
+				instancingData[index].World = worldMatrix;
 			}
 
 			ImGui_ImplDX12_NewFrame();
@@ -899,7 +946,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// instancing用のDataを読むためにStructuredBufferのSRVを設定する
 			commandList->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU);
 			// 描画! (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-			commandList->DrawInstanced(6, kNumInstance, 0, 0);
+			commandList->DrawInstanced(kVertexCount, kNumInstance, 0, 0);
 
 			// 実際のcommandListのImGuiの描画コマンドを積む
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
