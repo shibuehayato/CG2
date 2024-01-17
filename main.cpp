@@ -772,6 +772,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			vertexData[start + 1].normal.x = vertexData[start + 1].position.x;
 			vertexData[start + 1].normal.y = vertexData[start + 1].position.y;
 			vertexData[start + 1].normal.z = vertexData[start + 1].position.z;
+
+			vertexData[start + 2].normal.x = vertexData[start + 2].position.x;
+			vertexData[start + 2].normal.y = vertexData[start + 2].position.y;
+			vertexData[start + 2].normal.z = vertexData[start + 2].position.z;
 			// c
 			vertexData[start + 3].normal.x = vertexData[start + 3].position.x;
 			vertexData[start + 3].normal.y = vertexData[start + 3].position.y;
