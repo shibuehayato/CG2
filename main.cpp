@@ -923,7 +923,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else {
 			// ゲームの処理
 
-			//transform.rotate.y += 0.03f;
+			transform.rotate.y += 0.003f;
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 			wvpData->World = worldMatrix;
 
@@ -950,8 +950,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			  // 開発用のUIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 			ImGui::ShowDemoWindow();
 			
-			ImGui::Begin("Window");
+			ImGui::Begin("Settings");
 			ImGui::ColorEdit4("color", color);
+			ImGui::ColorEdit3("LightColor", &directionalLightData->color.x);
+			ImGui::DragFloat3("LightDirectional", &directionalLightData->direction.x);
+			ImGui::DragFloat("intensity", &directionalLightData->intensity);
 			ImGui::End();
 			materialData->color.x = color[0];
 			materialData->color.y = color[1];
