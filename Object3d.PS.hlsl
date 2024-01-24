@@ -19,10 +19,6 @@ struct DirectionalLight {
 	float intensity;
 };
 
-struct Camera {
-    float32_t3 worldPosition;
-};
-
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 
 ConstantBuffer<Camera> gCamera : register(b2);
@@ -32,7 +28,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	float32_t4 textureColor = gTexture.Sample(gSampler, input.texcoord);
 
 	if(gMaterial.enableLighting != 0){
-       float Ndotl = dot(normalize(input.normal), -gDirectionalLight.direction);
+       float Ndotl = dot(normalize(input.normal), normalize(-gDirectionalLight.direction));
 	   float cos = pow(Ndotl * 0.5f + 0.5f, 2.0f);
 	   output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
 
