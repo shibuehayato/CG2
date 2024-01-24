@@ -143,6 +143,16 @@ struct Material
 	int32_t enableLighting;
 };
 
+struct TransformationMatrix
+{
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+};
+
+struct CameraForGPU {
+	Vector3 worldPosition;
+};
+
 Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 	// CompilerするShaderファイルへのパス
 	const std::wstring& filePath,
