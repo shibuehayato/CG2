@@ -715,7 +715,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//materialData->position = { 1.0f, 0.0f, 0.0f, 1.0f };
 	materialData->color = { 1.0f,1.0f,1.0f,1.0f };
 	materialData->enableLighting = true;
-	materialData->shininess;
+	materialData->shininess=100;
 
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
@@ -955,7 +955,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 1000.0f);
 			Matrix4x4 viewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-			wvpData->WVP = Multiply(worldMatrix, viewProjectionMatrix);
+			wvpData->WVP = viewProjectionMatrix;
 
 			for (uint32_t index = 0; index < kNumInstance; ++index)
 			{
@@ -976,7 +976,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::Begin("Settings");
 			ImGui::ColorEdit4("color", color);
 			ImGui::ColorEdit3("LightColor", &directionalLightData->color.x);
-			ImGui::DragFloat3("LightDirectional", &directionalLightData->direction.x);
+			ImGui::SliderFloat3("LightDirectional", &directionalLightData->direction.x,-1.0f,1.0f);
 			ImGui::DragFloat("intensity", &directionalLightData->intensity);
 			ImGui::End();
 			materialData->color.x = color[0];
